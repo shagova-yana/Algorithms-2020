@@ -2,6 +2,8 @@
 
 package lesson1
 
+import java.io.File
+
 /**
  * Сортировка времён
  *
@@ -97,7 +99,25 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val map = mutableMapOf<Int, Int>()
+    for (i in -2730..5000) map[i] = 0 //O(N), где N = max(5000) - min(2730) + 1 ресурсоёмкость и трудоёмкость
+    var sum = 0
+    for (line in File(inputName).readLines()) { // O(N), где N = max(5000) - min(2730) + 1 трудоёмкость
+        val key = (line.toDouble() * 10).toInt()
+        val value = map.getValue(key)
+        map[key] = value + 1
+        sum++
+    }
+    val outputStream = File(outputName).bufferedWriter()
+    for ((key, value) in map) { // O(N), где N = max(5000) - min(2730) + 1 трудоёмкость
+        if (value >= 1)
+            for (i in 1..value) { // O(n) в худшем и O(1)в лучшем трудоёмкость
+                outputStream.write((key.toDouble() / 10).toString())
+                sum--
+                if (sum != 0) outputStream.newLine()
+            }
+    }
+    outputStream.close()
 }
 
 /**
