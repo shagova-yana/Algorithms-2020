@@ -2,6 +2,8 @@
 
 package lesson2
 
+import kotlin.collections.maxOrNull as kotlinCollectionsMaxOrNull
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -110,7 +112,7 @@ fun longestCommonSubstring(first: String, second: String): String {
                 else list[j] = 1
             else list[j] = 0
         }
-        val max = list.maxOrNull()
+        val max = list.kotlinCollectionsMaxOrNull()
         if (max!! > sub.first)
             sub = Pair(max, list.indexOf(max))
     }
