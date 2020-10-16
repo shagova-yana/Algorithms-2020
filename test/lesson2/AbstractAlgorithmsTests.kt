@@ -120,6 +120,15 @@ abstract class AbstractAlgorithmsTests {
                 File("input/ruslan_ludmila_2.txt").readText()
             ).trim()
         )
+        assertEquals("", longestCommonSubstring("задача", ""))
+        assertEquals("правда", longestCommonSubstring("правда", "правда"))
+        assertEquals(
+            "Придет время, когда наука опередит фантазию.",
+            longestCommonSubstring(
+                "Придет время, когда наука опередит фантазию.",
+                "Истинный учёный — это мечтатель, а кто им не является, тот называет себя практикантом. Придет время, когда наука опередит фантазию."
+            )
+        )
     }
 
     fun calcPrimesNumber(calcPrimesNumber: (Int) -> Int) {
@@ -144,5 +153,9 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(148933, calcPrimesNumber(2000000))
         assertEquals(348513, calcPrimesNumber(5000000))
         assertEquals(664579, calcPrimesNumber(10000000))
+        assertEquals(0, calcPrimesNumber(-100))
+        assertEquals(0, calcPrimesNumber(0))
+        assertEquals(41, calcPrimesNumber(180))
+        assertEquals(1270607, calcPrimesNumber(20000000))
     }
 }

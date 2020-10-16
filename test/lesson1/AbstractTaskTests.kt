@@ -118,6 +118,66 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        try {
+            sortTemperatures("input/temp_in2.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+-273.0
+-270.9
+-256.0
+-201.5
+-199.9
+-185.6
+-124.9
+-99.9
+-90.4
+-90.1
+-81.0
+-78.3
+-56.3
+-45.9
+-45.3
+-45.2
+-41.9
+-22.6
+-12.2
+-12.0
+-3.0
+-1.6
+-1.0
+0.0
+0.2
+4.0
+14.3
+15.0
+24.0
+26.4
+29.8
+32.4
+45.7
+47.0
+85.1
+85.2
+89.4
+124.2
+124.5
+125.4
+152.8
+200.0
+201.4
+245.3
+375.2
+415.8
+456.0
+458.3
+499.9
+500.0
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
 
         fun testGeneratedTemperatures(size: Int): PerfResult<Unit> {
             try {
@@ -272,6 +332,99 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                         41
                         32
                         32
+                    """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            sortSequence("input/seq_in6.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                    25
+                    14
+                    1
+                    2
+                    84
+                    57
+                    65
+                    48
+                    32
+                    1547
+                    2454
+                    12549
+                    245
+                    12
+                    14
+                    0
+                    4
+                    8
+                    99
+                    99
+                    65
+                    78
+                    32
+                    45
+                    85
+                    47
+                    68
+                    12547
+                    688
+                    688
+                    84
+                    52
+                    12
+                    147
+                    1236
+                    14
+                    45
+                    65
+                    78
+                    75
+                    71
+                    72
+                    26
+                    49
+                    86
+                    55
+                    11
+                    12
+                    54
+                    17
+                    46
+                    65
+                    48
+                    36
+                    39
+                    28
+                    29
+                    17
+                    15
+                    34
+                    72
+                    70
+                    10
+                    51
+                    50
+                    458
+                    72
+                    50
+                    60
+                    62
+                    64
+                    95
+                    15
+                    125
+                    125
+                    125
+                    125
+                    125
+                    125
+                    125
+                    125
+                    125
+                    125
                     """.trimIndent()
             )
         } finally {

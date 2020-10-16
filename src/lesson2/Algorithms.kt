@@ -95,8 +95,27 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
-}
+    if (first.isEmpty() || second.isEmpty()) return ""
+    if (first == second || second == first) return first
+    if (second.length > first.length) return longestCommonSubstring(second, first)
+
+    val list = MutableList(second.length) { 0 }
+    var sub = Pair(0, 0)
+    for (symbol in first) { // O(n)
+        val copy = mutableListOf<Int>()
+        copy.addAll(list)
+        for (j in second.indices) { // O(m)
+            if (symbol == second[j])
+                if (j > 0) list[j] = copy[j - 1] + 1
+                else list[j] = 1
+            else list[j] = 0
+        }
+        val max = list.maxOrNull()
+        if (max!! > sub.first)
+            sub = Pair(max, list.indexOf(max))
+    }
+    return second.substring(sub.second - sub.first + 1, sub.second + 1)
+} // O(n * m)
 
 /**
  * Число простых чисел в интервале
@@ -109,5 +128,19 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Единица простым числом не считается.
  */
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
-}
+    if (limit <= 1) return 0
+    val s: Array<Int> = Array(limit + 1) { 1 } // O(n) - ресурсоёмксоть
+    s[1] = 0
+    var i = 2
+    while (i * i <= limit) { // O(n) - трудоёмкость
+        if (s[i] == 1)
+            for (k in i * i..limit step i) // O(~log log n) - трудоёмкость
+                s[k] = 0
+        i++
+    }
+    var count = 0
+    for (i in 2..limit)
+        if (s[i] == 1) count++
+    return count
+} // O(n) - ресурсоёмксоть и O(n log log n) - трудоёмкость
+

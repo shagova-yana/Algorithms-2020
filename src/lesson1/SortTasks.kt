@@ -150,7 +150,54 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  */
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    val map = mutableMapOf<Int, Int>() // O(n) - ресурсоёмкость
+    val sequence = mutableListOf<Int>() // O(n) - ресурсоёмкость
+    var count = 0
+    var min = 0
+    var f = false
+    val result = mutableMapOf<Int, Int>()
+    for (line in File(inputName).readLines()) { // O(n) - трудоёмкость
+        val element = line.toInt()
+        sequence.add(element)
+        if (map.containsKey(element)) {
+            val value = map[element]
+            if (value != null) {
+                map[element] = value + 1
+            }
+        } else map[element] = 1
+        if (map.getValue(element) > count && f) {
+            result.clear()
+            min = element
+            count = map.getValue(element)
+            f = false
+        }
+        if (map.getValue(element) > count) {
+            count = map.getValue(element)
+            min = element
+        }
+        if (map.getValue(element) == count) {
+            result[min] = count
+            result[element] = count
+            f = true
+        }
+    }
+    if (result.size > 1) {
+        val list = result.keys // O(n) - ресурсоёмкость
+        min = list.minOrNull()!!.toInt()
+        count = result.getValue(min)
+    }
+    val output = File(outputName).bufferedWriter()
+    for (element in sequence) { // O(n) - трудоёмкость
+        if (element != min) {
+            output.write(element.toString())
+            output.newLine()
+        }
+    }
+    for (i in 1..count) { // O(k) трудоёмкость, где k - количество повторов числа
+        output.write(min.toString())
+        if (i != count) output.newLine()
+    }
+    output.close()
 }
 
 /**
