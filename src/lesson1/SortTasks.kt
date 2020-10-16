@@ -183,7 +183,9 @@ fun sortSequence(inputName: String, outputName: String) {
     }
     if (result.size > 1) {
         val list = result.keys // O(n) - ресурсоёмкость
-        min = list.minOrNull()!!.toInt()
+        min = Int.MAX_VALUE
+        for (element in list)
+            if (element < min) min = element
         count = result.getValue(min)
     }
     val output = File(outputName).bufferedWriter()

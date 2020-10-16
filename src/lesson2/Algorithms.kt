@@ -112,7 +112,9 @@ fun longestCommonSubstring(first: String, second: String): String {
                 else list[j] = 1
             else list[j] = 0
         }
-        val max = list.kotlinCollectionsMaxOrNull()
+        var max = 0
+        for (element in list)
+            if (element > max) max = element
         if (max!! > sub.first)
             sub = Pair(max, list.indexOf(max))
     }
