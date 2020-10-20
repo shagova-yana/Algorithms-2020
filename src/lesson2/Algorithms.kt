@@ -115,11 +115,11 @@ fun longestCommonSubstring(first: String, second: String): String {
         var max = 0
         for (element in list)
             if (element > max) max = element
-        if (max!! > sub.first)
+        if (max > sub.first)
             sub = Pair(max, list.indexOf(max))
     }
     return second.substring(sub.second - sub.first + 1, sub.second + 1)
-} // O(n * m)
+} // O(n * m) - трудоёмкость, 2*O(m) - ресурсоёмкость.
 
 /**
  * Число простых чисел в интервале
@@ -133,7 +133,7 @@ fun longestCommonSubstring(first: String, second: String): String {
  */
 fun calcPrimesNumber(limit: Int): Int {
     if (limit <= 1) return 0
-    val s: Array<Int> = Array(limit + 1) { 1 } // O(n) - ресурсоёмксоть
+    val s = Array(limit + 1) { 1 } // O(n) - ресурсоёмксоть
     s[1] = 0
     var i = 2
     while (i * i <= limit) { // O(n) - трудоёмкость
@@ -146,5 +146,5 @@ fun calcPrimesNumber(limit: Int): Int {
     for (i in 2..limit)
         if (s[i] == 1) count++
     return count
-} // O(n) - ресурсоёмксоть и O(n log log n) - трудоёмкость
+} // O(n) - ресурсоёмксоть и O(n log log n) - трудоёмкость.
 

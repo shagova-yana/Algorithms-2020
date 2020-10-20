@@ -99,26 +99,27 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    val map = mutableMapOf<Int, Int>()
-    for (i in -2730..5000) map[i] = 0 //O(N), где N = max(5000) - min(2730) + 1 ресурсоёмкость и трудоёмкость
+    val list = Array<Int>(7731) { 0 }
     var sum = 0
-    for (line in File(inputName).readLines()) { // O(N), где N = max(5000) - min(2730) + 1 трудоёмкость
-        val key = (line.toDouble() * 10).toInt()
-        val value = map.getValue(key)
-        map[key] = value + 1
+    for (line in File(inputName).readLines()) {
+        val element = (line.toDouble() * 10).toInt()
+        list[element + 2730] = list[element + 2730] + 1
         sum++
     }
-    val outputStream = File(outputName).bufferedWriter()
-    for ((key, value) in map) { // O(N), где N = max(5000) - min(2730) + 1 трудоёмкость
-        if (value >= 1)
-            for (i in 1..value) { // O(n) в худшем и O(1)в лучшем трудоёмкость
-                outputStream.write((key.toDouble() / 10).toString())
-                sum--
-                if (sum != 0) outputStream.newLine()
-            }
+    File(outputName).bufferedWriter().use {
+        var count = -2730
+        for (element in list) {
+            if (element >= 1)
+                for (i in 1..element) { // O(n) в худшем и O(1)в лучшем трудоёмкость
+                    it.write((count.toDouble() / 10).toString())
+                    sum--
+                    if (sum != 0) it.newLine()
+                }
+            count++
+        }
     }
-    outputStream.close()
-}
+} // O(N), где N = max(5000) - min(2730) + 1 ресурсоёмкость,
+// 2O(N) + O(n)(в худшем случае либо O(1) в лучшем) - трудоёмкость.
 
 /**
  * Сортировка последовательности
@@ -150,13 +151,13 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  */
 fun sortSequence(inputName: String, outputName: String) {
-    val map = mutableMapOf<Int, Int>() // O(n) - ресурсоёмкость
-    val sequence = mutableListOf<Int>() // O(n) - ресурсоёмкость
+    val map = mutableMapOf<Int, Int>()
+    val sequence = mutableListOf<Int>()
     var count = 0
     var min = 0
     var f = false
     val result = mutableMapOf<Int, Int>()
-    for (line in File(inputName).readLines()) { // O(n) - трудоёмкость
+    for (line in File(inputName).readLines()) {
         val element = line.toInt()
         sequence.add(element)
         if (map.containsKey(element)) {
@@ -182,25 +183,26 @@ fun sortSequence(inputName: String, outputName: String) {
         }
     }
     if (result.size > 1) {
-        val list = result.keys // O(n) - ресурсоёмкость
+        val list = result.keys
         min = Int.MAX_VALUE
         for (element in list)
             if (element < min) min = element
         count = result.getValue(min)
     }
-    val output = File(outputName).bufferedWriter()
-    for (element in sequence) { // O(n) - трудоёмкость
-        if (element != min) {
-            output.write(element.toString())
-            output.newLine()
+    File(outputName).bufferedWriter().use {
+        for (element in sequence) {
+            if (element != min) {
+                it.write(element.toString())
+                it.newLine()
+            }
+        }
+        for (i in 1..count) { // O(k) трудоёмкость, где k - количество повторов числа
+            it.write(min.toString())
+            if (i != count) it.newLine()
         }
     }
-    for (i in 1..count) { // O(k) трудоёмкость, где k - количество повторов числа
-        output.write(min.toString())
-        if (i != count) output.newLine()
-    }
-    output.close()
-}
+} // 2*O(n) - ресурсоёмкость, 2*O(n) + O(k),
+// где k - количество повторов числа и в худшем случае это O(n), лучшем O(2) - трудоёмкость.
 
 /**
  * Соединить два отсортированных массива в один
