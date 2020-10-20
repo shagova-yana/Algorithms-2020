@@ -184,9 +184,7 @@ fun sortSequence(inputName: String, outputName: String) {
     }
     if (result.size > 1) {
         val list = result.keys
-        min = Int.MAX_VALUE
-        for (element in list)
-            if (element < min) min = element
+        min = list.minOrNull()!!.toInt()
         count = result.getValue(min)
     }
     File(outputName).bufferedWriter().use {
