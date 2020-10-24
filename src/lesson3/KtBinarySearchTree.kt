@@ -1,6 +1,7 @@
 package lesson3
 
 import java.util.*
+import kotlin.IllegalStateException
 import kotlin.math.max
 
 // attention: Comparable is supported but Comparator is not
@@ -80,7 +81,63 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
      * Средняя
      */
     override fun remove(element: T): Boolean {
-        TODO()
+        fun findParent(begin: Node<T>): Node<T>? {
+            if (element < begin.value) {
+                val left = begin.left ?: return null
+                if (left.value == element) return begin
+                return findParent(left)
+            }
+            if (element > begin.value) {
+                val right = begin.right ?: return null
+                if (right.value == element) return begin
+                return findParent(right)
+            }
+            throw IllegalStateException()
+        }
+
+        var closest = find(element) ?: return false
+        val head = root ?: return false
+        val parent = findParent(head) ?: return false
+        //нет потомков
+        if (closest.right == null && closest.left == null) {
+            if (parent?.value!! > closest.value)
+                parent.left = null
+            if (parent.value < closest.value)
+                parent.right = null
+        }
+        // есть один потомок
+        if (closest.right == null || closest.left == null) {
+            if (closest.left != null) {
+                if (parent?.value!! > closest.value)
+                    parent.left = closest.left
+                if (parent.value < closest.value)
+                    parent.right = closest.left
+                closest.left = null
+            }
+            if (closest.right != null) {
+                if (parent?.value!! > closest.value)
+                    parent.left = closest.right
+                if (parent.value < closest.value)
+                    parent.right = closest.right
+                closest.right = null
+            }
+        }
+        // два потомка
+        if (closest.right != null && closest.left != null) {
+            var root = closest.right
+            var parentRoot: Node<T>? = null
+            while (root?.left != null) {
+                parentRoot = root
+                root = root.left
+            }
+            closest = root!!
+            root = closest.right
+            while (root?.value != parentRoot?.value)
+                root = root?.left
+            root?.left = null
+        }
+        size--
+        return true
     }
 
     override fun comparator(): Comparator<in T>? =
