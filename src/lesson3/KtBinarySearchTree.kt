@@ -1,6 +1,5 @@
 package lesson3
 
-import jdk.vm.ci.code.Location.stack
 import java.util.*
 import kotlin.math.max
 
@@ -200,6 +199,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
 
             var node = queue.pop()
             val result = node.value
+            last = node
             if (node.right != null) {
                 node = node.right
                 while (node != null) {
