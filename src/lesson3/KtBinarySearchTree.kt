@@ -96,7 +96,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         return start.left?.let { findMin(it, start) } ?: Pair(start, parent)
     }
 
-    // O(log n) - среднее, O(n) - худшая трудоёмксоть
+    // O(log n) - среднее, O(n) - худшая трудоёмкость
     override fun remove(element: T): Boolean {
         val head = root ?: return false
         val (fitNode, parentNode) = findWithParent(head, null, element)
@@ -151,17 +151,13 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
 
         var queue = ArrayDeque<Node<T>>()
         var last: Node<T>? = null
+        var curRoot = root
+
 
         init {
-            var node = root
-            while (node != null || !queue.isEmpty()) {
-                if (node != null) {
-                    queue.push(node)
-                    node = node.left
-                } else {
-                    node = queue.pop()
-                    node = node.right
-                }
+            while (curRoot != null) {
+                queue.push(curRoot)
+                curRoot = curRoot?.left
             }
         }
 
@@ -194,20 +190,20 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
+        // O(const) - трудоёмкость, O(h) - ресурсоёмкость
         override fun next(): T {
-            if (queue.isEmpty()) throw NoSuchElementException()
-
-            var node = queue.pop()
-            val result = node.value
-            last = node
-            if (node.right != null) {
-                node = node.right
-                while (node != null) {
-                    queue.push(node)
-                    node = node.left
+            if (!hasNext()) throw NoSuchElementException()
+            curRoot = queue.pop()
+            val result = curRoot?.value
+            last = curRoot!!
+            if (curRoot?.right != null) {
+                curRoot = curRoot?.right;
+                while (curRoot != null) {
+                    queue.push(curRoot);
+                    curRoot = curRoot?.left;
                 }
             }
-            return result
+            return result!!
         }
 
         /**
@@ -222,6 +218,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Сложная
          */
+        // O(log n) - среднее, O(n) - худшая трудоёмкость, O(const) - ресурсоёмкость
         override fun remove() {
             if (last == null) throw IllegalStateException()
             remove(last!!.value)
