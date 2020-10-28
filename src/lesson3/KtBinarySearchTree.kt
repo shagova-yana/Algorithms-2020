@@ -1,14 +1,15 @@
 package lesson3
 
+import jdk.vm.ci.code.Location.stack
 import java.util.*
-import kotlin.IllegalStateException
 import kotlin.math.max
+
 
 // attention: Comparable is supported but Comparator is not
 class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSortedSet<T> {
 
-    private class Node<T>(
-        val value: T
+    class Node<T>(
+        var value: T
     ) {
         var left: Node<T>? = null
         var right: Node<T>? = null
@@ -80,64 +81,65 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
      *
      * Средняя
      */
-    override fun remove(element: T): Boolean {
-        fun findParent(begin: Node<T>): Node<T>? {
-            if (element < begin.value) {
-                val left = begin.left ?: return null
-                if (left.value == element) return begin
-                return findParent(left)
-            }
-            if (element > begin.value) {
-                val right = begin.right ?: return null
-                if (right.value == element) return begin
-                return findParent(right)
-            }
-            throw IllegalStateException()
+    private fun findWithParent(startNode: Node<T>, parentNode: Node<T>? = null, value: T): Pair<Node<T>, Node<T>?> {
+        val comparison = startNode.value.let { value.compareTo(it) }
+        return when {
+            comparison == 0 -> Pair(startNode, parentNode)
+            comparison < 0 -> startNode.left?.let { findWithParent(it, startNode, value) } ?: Pair(
+                startNode,
+                parentNode
+            )
+            else -> startNode.right?.let { findWithParent(it, startNode, value) } ?: Pair(startNode, parentNode)
         }
+    }
 
-        var closest = find(element) ?: return false
+    private fun findMin(start: Node<T>, parent: Node<T>): Pair<Node<T>, Node<T>> {
+        return start.left?.let { findMin(it, start) } ?: Pair(start, parent)
+    }
+
+    // O(log n) - среднее, O(n) - худшая трудоёмксоть
+    override fun remove(element: T): Boolean {
         val head = root ?: return false
-        val parent = findParent(head) ?: return false
+        val (fitNode, parentNode) = findWithParent(head, null, element)
+        if (fitNode.value != element) return false
+
         //нет потомков
-        if (closest.right == null && closest.left == null) {
-            if (parent?.value!! > closest.value)
-                parent.left = null
-            if (parent.value < closest.value)
-                parent.right = null
+        if (fitNode.right == null && fitNode.left == null) {
+            if (parentNode == null)
+                root = null
+            if (parentNode!!.left == fitNode)
+                parentNode.left = null
+            else parentNode.right = null
+            size--
+            return true
         }
-        // есть один потомок
-        if (closest.right == null || closest.left == null) {
-            if (closest.left != null) {
-                if (parent?.value!! > closest.value)
-                    parent.left = closest.left
-                if (parent.value < closest.value)
-                    parent.right = closest.left
-                closest.left = null
+        // один потомок
+        if (fitNode.right == null || fitNode.left == null) {
+            val children = if (fitNode.left != null) fitNode.left!! else fitNode.right!!
+            if (parentNode == null) {
+                root = children
+                size--
+                return true
             }
-            if (closest.right != null) {
-                if (parent?.value!! > closest.value)
-                    parent.left = closest.right
-                if (parent.value < closest.value)
-                    parent.right = closest.right
-                closest.right = null
-            }
+            if (parentNode.left == fitNode)
+                parentNode.left = children
+            else parentNode.right = children
+            size--
+            return true
         }
         // два потомка
-        if (closest.right != null && closest.left != null) {
-            var root = closest.right
-            var parentRoot: Node<T>? = null
-            while (root?.left != null) {
-                parentRoot = root
-                root = root.left
+        if (fitNode.right != null && fitNode.left != null) {
+            val (rootMin, parentMin) = findMin(fitNode.right!!, fitNode)
+            fitNode.value = rootMin.value
+            if (parentMin.left!!.value == rootMin.value) {
+                parentMin.left = rootMin.right
+            } else {
+                parentMin.right = rootMin.right
             }
-            closest = root!!
-            root = closest.right
-            while (root?.value != parentRoot?.value)
-                root = root?.left
-            root?.left = null
+            size--
+            return true
         }
-        size--
-        return true
+        return false
     }
 
     override fun comparator(): Comparator<in T>? =
@@ -147,6 +149,22 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         BinarySearchTreeIterator()
 
     inner class BinarySearchTreeIterator internal constructor() : MutableIterator<T> {
+
+        var queue = ArrayDeque<Node<T>>()
+        var last: Node<T>? = null
+
+        init {
+            var node = root
+            while (node != null || !queue.isEmpty()) {
+                if (node != null) {
+                    queue.push(node)
+                    node = node.left
+                } else {
+                    node = queue.pop()
+                    node = node.right
+                }
+            }
+        }
 
         /**
          * Проверка наличия следующего элемента
@@ -158,9 +176,10 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
+
+        // O(const) - трудоёмкость
         override fun hasNext(): Boolean {
-            // TODO
-            throw NotImplementedError()
+            return queue.isNotEmpty()
         }
 
         /**
@@ -177,8 +196,18 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          * Средняя
          */
         override fun next(): T {
-            // TODO
-            throw NotImplementedError()
+            if (queue.isEmpty()) throw NoSuchElementException()
+
+            var node = queue.pop()
+            val result = node.value
+            if (node.right != null) {
+                node = node.right
+                while (node != null) {
+                    queue.push(node)
+                    node = node.left
+                }
+            }
+            return result
         }
 
         /**
@@ -194,8 +223,9 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          * Сложная
          */
         override fun remove() {
-            // TODO
-            throw NotImplementedError()
+            if (last == null) throw IllegalStateException()
+            remove(last!!.value)
+            last = null
         }
 
     }
