@@ -2,6 +2,12 @@
 
 package lesson6
 
+import lesson6.Graph.Vertex
+import lesson6.VertexColor.Colours.WHITE
+import java.awt.Color.WHITE
+import java.util.*
+
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -90,9 +96,56 @@ fun Graph.minimumSpanningTree(): Graph {
  *
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
-fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
-    TODO()
+class VertexColor internal constructor(vertexColour: Colours, previous: Vertex?) {
+    enum class Colours {
+        WHITE, GREY, BlACK
+    }
+
+    var vertexColour: Colours = vertexColour
+    var previous: Vertex? = previous
 }
+
+fun dfs(vertex: Vertex, map: MutableMap<Vertex, VertexColor>, graph: Graph, cycle: MutableList<Int>) {
+    map.getValue(vertex).vertexColour = VertexColor.Colours.GREY
+    for (neighbour in graph.getNeighbors(vertex)) {
+        if (map.getValue(neighbour).vertexColour == VertexColor.Colours.WHITE) {
+            map.getValue(neighbour).previous = vertex
+            dfs(neighbour, map, graph, cycle)
+        }
+        if (map.getValue(neighbour).vertexColour == VertexColor.Colours.GREY
+            && map.getValue(vertex).previous != neighbour)
+            cycle.add(1)
+    }
+    map.getValue(vertex).vertexColour = VertexColor.Colours.BlACK
+}
+
+private fun isCycle(graph: Graph): Boolean {
+    val map = mutableMapOf<Vertex, VertexColor>()
+    val cycle = mutableListOf<Int>()
+    for (element in graph.vertices)
+        map[element] = VertexColor(VertexColor.Colours.WHITE, null)
+    for (vertex in graph.vertices) {
+        if (map.getValue(vertex).vertexColour == VertexColor.Colours.WHITE)
+            dfs(vertex, map, graph, cycle)
+        if (cycle.isNotEmpty())
+            return true
+    }
+    return false
+}
+
+fun Graph.largestIndependentVertexSet(): Set<Vertex> {
+    if (isCycle(this)) throw IllegalArgumentException()
+    val result = mutableSetOf<Vertex>()
+    val vertices = this.vertices
+    while (vertices.isNotEmpty()) {
+        val element = vertices.first()
+        result.add(element)
+        vertices.removeAll(getNeighbors(element))
+        vertices.remove(element)
+    }
+    return result
+}
+// ресурсоёмкость - O(V), трудоёмкость - O(V+E)
 
 /**
  * Наидлиннейший простой путь.
@@ -115,8 +168,36 @@ fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
  */
 fun Graph.longestSimplePath(): Path {
-    TODO()
-}
+
+    fun search(vertex: Vertex, graph: Graph, current: MutableList<Vertex>, path: MutableList<Vertex>) {
+        if (!current.contains(vertex)) {
+            current.add(vertex)
+            for (neighbour in this.getNeighbors(vertex))
+                if (!current.contains(neighbour))
+                    search(neighbour, this, current, path)
+        }
+        if (current.size > path.size) {
+            path.clear()
+            path.addAll(current)
+        }
+        if (current.size != 1) current.remove(current.last())
+    }//O(E^V)
+
+    if (this.vertices.isEmpty()) return Path()
+    val longestPath = mutableListOf<Vertex>()
+    var current: MutableList<Vertex>
+    for (vertex in this.vertices) {
+        current = mutableListOf()
+        if (longestPath.size != this.vertices.size) {
+            search(vertex, this, current, longestPath)
+        } else break
+    }
+    var path = Path(longestPath[0])
+    if (longestPath.size > 1)
+        for (i in 1 until longestPath.size)
+            path = Path(path, this, longestPath[i])
+    return path
+}// ресурсоёмкость - O(2V), трудоёмкость - O(V*E^V)
 
 /**
  * Балда

@@ -35,6 +35,34 @@ abstract class AbstractDynamicTests {
                 """.trimIndent()
             ).length, "Answer must have length of $expectedLength2"
         )
+
+        val expectedLength3 = """
+Сая анина блая ла,
+авн ока на сон ы  бло а по леа.
+ поде ме? не   а
+        """.trimIndent().length
+        assertEquals(
+            expectedLength3, longestCommonSubSequence(
+                """
+Слышишь — мчатся сани, слышишь — сани мчатся.
+Хорошо с любимой в поле затеряться.
+Ветерок веселый робок и застенчив,
+По равнине голой катится бубенчик.
+Эх вы, сани, сани! Конь ты мой буланый!
+Где-то на поляне клен танцует пьяный.
+Мы к нему подъедем, спросим — что такое?
+И станцуем вместе под тальянку трое.
+                """.trimIndent(),
+                """
+Снежная равнина, белая луна,
+Саваном покрыта наша сторона.
+И березы в белом плачут по лесам.
+Кто погиб здесь? Умер? Уж не я ли сам?
+                """.trimIndent()
+            ).length, "Answer must have length of $expectedLength2"
+        )
+        assertEquals("", longestCommonSubSequence("", ""))
+
     }
 
     fun longestIncreasingSubSequence(longestIncreasingSubSequence: (List<Int>) -> List<Int>) {
